@@ -1,0 +1,49 @@
+
+# Gradle files
+.gradle/
+**/build/
+!gradle-wrapper.jar
+
+# Local configuration
+/local.properties
+/.idea
+/.idea/**
+
+# Keystore files (sensitive)
+*.jks
+*.keystore
+
+# Log files
+*.log
+
+# Android Studio specific
+.idea/
+*.iml
+*.ipr
+*.iws
+.DS_Store
+
+# Generated files
+build/
+captures/
+outputs/
+.gen/
+bin/
+gen/
+
+# IntelliJ
+*.class
+*.hprof
+
+# Mac/Linux/Windows OS files
+*.swp
+*~
+Thumbs.db
+Desktop.ini
+
+# Kotlin specific
+*.kotlin_module
+
+# Others
+.env
+
