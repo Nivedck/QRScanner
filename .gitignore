@@ -9,6 +9,10 @@
 /.idea
 /.idea/**
 
+gitkey
+gitkey.pub
+
+
 # Keystore files (sensitive)
 *.jks
 *.keystore
