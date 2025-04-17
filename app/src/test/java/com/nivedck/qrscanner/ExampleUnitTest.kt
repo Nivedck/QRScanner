@@ -1,4 +1,4 @@
-package com.Nivedck.qrscanner
+package com.nivedck.qrscanner
 
 import org.junit.Test
 
