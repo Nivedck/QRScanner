@@ -1,9 +1,15 @@
-package com.nivedck.qrscanner  // Make sure this matches your actual package structure
+package com.nivedck.qrscanner
 
 import android.Manifest
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -21,9 +27,9 @@ class QRScannerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_qr_scanner)  // Make sure this layout exists
+        setContentView(R.layout.activity_qr_scanner)
 
-        barcodeView = findViewById(R.id.barcode_scanner)  // Make sure this ID exists in your layout
+        barcodeView = findViewById(R.id.barcode_scanner)
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
             != PackageManager.PERMISSION_GRANTED) {
@@ -40,13 +46,40 @@ class QRScannerActivity : AppCompatActivity() {
     private fun startScanning() {
         barcodeView.decodeContinuous(object : BarcodeCallback {
             override fun barcodeResult(result: BarcodeResult?) {
-                result?.text?.let {
-                    Toast.makeText(this@QRScannerActivity, "Scanned: $it", Toast.LENGTH_LONG).show()
+                result?.text?.let { scannedText ->
+                    barcodeView.pause()
+
+                    if (scannedText.startsWith("http://") || scannedText.startsWith("https://")) {
+                        showActionDialog(scannedText)
+                    } else {
+                        Toast.makeText(this@QRScannerActivity, "Scanned: $scannedText", Toast.LENGTH_LONG).show()
+                        barcodeView.resume()
+                    }
                 }
             }
 
             override fun possibleResultPoints(resultPoints: MutableList<com.google.zxing.ResultPoint>?) {}
         })
+    }
+
+    private fun showActionDialog(link: String) {
+        AlertDialog.Builder(this)
+            .setTitle("QR Code Scanned")
+            .setMessage("What would you like to do with this link?\n$link")
+            .setPositiveButton("Open in Browser") { _, _ ->
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
+                startActivity(intent)
+            }
+            .setNegativeButton("Copy Link") { _, _ ->
+                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText("QR Link", link)
+                clipboard.setPrimaryClip(clip)
+                Toast.makeText(this, "Link copied to clipboard", Toast.LENGTH_SHORT).show()
+            }
+            .setOnDismissListener {
+                barcodeView.resume()
+            }
+            .show()
     }
 
     override fun onRequestPermissionsResult(
